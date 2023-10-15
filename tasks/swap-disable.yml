@@ -1,0 +1,33 @@
+# code: language=ansible
+---
+# Set sysctl profiles for vm.swappiness
+- name: Set sysctl vm.swappiness
+  become: true
+  ansible.posix.sysctl:
+    name: 'vm.swappiness'
+    value: '{{ swap_config.swappiness.value }}'
+    sysctl_file: '{{ swap_config.swappiness.file }}'
+    state: '{{ swap_config.state }}'
+
+- name: Remove config file sysctl vm.swappiness
+  become: true
+  ansible.builtin.file:
+    path: '{{ swap_config.swappiness.file }}'
+    state: absent
+
+- name: Check if swap file exists
+  ansible.builtin.stat:
+    path: '{{ swap_config.file }}'
+  register: swap_file_state
+
+- name: Run swapoff on the swap file.
+  become: true
+  ansible.builtin.command: >
+    swapoff {{ swap_config.file }}
+  when: swap_file_state.stat.exists
+  changed_when: swap_file_state.stat.exists
+
+- name: Remove swap file.
+  ansible.builtin.file:
+    path: '{{ swap_config.file }}'
+    state: absent

@@ -1,0 +1,11 @@
+# code: language=ansible
+---
+# Defaults dictionary for swap role
+swap_defaults:
+  debug: '{{ swap_debug }}'
+  state: '{{ swap_state }}'
+  file: '{{ swap_file_path }}'
+  size: '{{ swap_file_size_mb }}'
+  swappiness:
+    value: '{{ swap_swappiness_value }}'
+    file: '{{ swap_swappiness_config_file }}'

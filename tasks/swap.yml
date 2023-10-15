@@ -1,0 +1,42 @@
+# code: language=ansible
+---
+# Main tasks file for role
+- name: Setting OS variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.os_family }}.yml'
+        - default.yml
+      paths:
+        - vars/os_family
+
+- name: Set swap_config
+  ansible.builtin.set_fact:
+    swap_config: >-
+      {{ swap_defaults |
+        ansible.builtin.combine( (swap | default(swap_defaults)), recursive=true )
+      }}
+
+- name: Print swap_config dictionary if debug flag is set
+  ansible.builtin.debug:
+    var: swap_config
+  when: swap_config.debug
+
+- name: Manage swap file entry in fstab.
+  ansible.posix.mount:
+    path: none
+    src: '{{ swap_config.file }}'
+    fstype: swap
+    opts: sw
+    state: '{{ swap_config.state }}'
+
+- name: Enable swap file | include task > swap-enable.yml
+  ansible.builtin.include_tasks:
+    file: swap-enable.yml
+  when: swap_config.state == 'present'
+
+- name: Disable swap file | include task > swap-disable.yml
+  ansible.builtin.include_tasks:
+    file: swap-disable.yml
+  when: swap_config.state == 'absent'
