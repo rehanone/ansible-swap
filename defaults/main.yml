@@ -1,0 +1,14 @@
+# code: language=ansible
+---
+# Allows logging of the final configuration dictionary with all defaulted values which can be helpful for debugging
+# Default value for debug is false
+swap_debug: false
+
+swap_state: present
+
+swap_file_path: '/swap.img'
+
+swap_file_size_mb: 512
+
+swap_swappiness_value: 60
+swap_swappiness_config_file: '/etc/sysctl.d/50-vm-swappiness.conf'

@@ -1,0 +1,4 @@
+# code: language=ansible
+---
+- name: Main swap tasks
+  ansible.builtin.include_tasks: swap.yml
